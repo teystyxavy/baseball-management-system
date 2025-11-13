@@ -1,15 +1,16 @@
 package main
 
 import (
+	"backend/internal/middleware"
+	"backend/internal/model"
+	"backend/internal/route"
+	"fmt"
 	"log"
 	"os"
-	"web-gin/internal/route"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"fmt"
-	"web-gin/internal/model"
 )
 
 func main() {
@@ -43,9 +44,14 @@ func main() {
 		c.Next()
 	}) 
 
-	route.SetPlayerRoutes(router)
-	route.SetGameRoutes(router)
-	route.SetTeamRoutes(router)
-	route.SetUserRoutes(router)
+	router.Use(middleware.ErrorHandler())
+
+	route.SetPublicRoutes(router)
+
+	protected := router.Group("/api")
+	protected.Use(middleware.AuthMiddleware())
+	route.SetProtectedRoutes(protected)
+	route.SetPublicRoutes(router)
+	
 	router.Run("localhost:8080")
 }

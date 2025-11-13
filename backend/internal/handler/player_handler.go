@@ -1,17 +1,16 @@
 package handler
 
-
 import (
 	"fmt"
 	"net/http"
 	"strconv"
 	"github.com/gin-gonic/gin"
-	"web-gin/internal/model"
-	"web-gin/internal/db"
+	"backend/internal/model"
+	"backend/internal/db"
 )
 
 
-	func GetUsers(c *gin.Context){
+	func GetPlayers(c *gin.Context){
 		db := db.GetDB(c)
 
 		var players []model.Player
@@ -24,7 +23,7 @@ import (
 		c.IndentedJSON(http.StatusOK, players)
 	}
 
-	func GetUserByID(c *gin.Context){
+	func GetPlayerByID(c *gin.Context){
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 
@@ -47,7 +46,7 @@ import (
 		c.IndentedJSON(http.StatusOK, player)
 	}
 
-	func CreateUser(c *gin.Context){
+	func CreatePlayer(c *gin.Context){
 		var newPlayer model.Player
 
 		// bind received JSON body to newAlbum
@@ -68,7 +67,7 @@ import (
 		c.IndentedJSON(http.StatusCreated, newPlayer)
 	}
 
-	func DeleteUserById(c *gin.Context){
+	func DeletePlayerById(c *gin.Context){
 		idStr := c.Param("id")
 
 		id, err := strconv.Atoi(idStr)
@@ -90,7 +89,7 @@ import (
 		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("player with id %d deleted", id)})
 	}
 
-	func UpdateUserById(c *gin.Context){
+	func UpdatePlayerById(c *gin.Context){
 		var updatedPlayer model.Player
 
 		if err := c.ShouldBindJSON(&updatedPlayer); err != nil {
@@ -106,4 +105,6 @@ import (
 			c.JSON(http.StatusNotFound, gin.H{"message": "album not found"})
 		}
 	}
+
+
 

@@ -1,29 +1,30 @@
 package handler
 
+
 import (
 	"fmt"
 	"net/http"
 	"strconv"
 	"github.com/gin-gonic/gin"
-	"web-gin/internal/model"
-	"web-gin/internal/db"
+	"backend/internal/model"
+	"backend/internal/db"
 )
 
 
-	func GetGame(c *gin.Context){
+	func GetUsers(c *gin.Context){
 		db := db.GetDB(c)
 
-		var games []model.Game
-		result := db.Find(&games)
+		var players []model.Player
+		result := db.Find(&players)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c.IndentedJSON(http.StatusOK, games)
+		c.IndentedJSON(http.StatusOK, players)
 	}
 
-	func GetGameByID(c *gin.Context){
+	func GetUserByID(c *gin.Context){
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 
@@ -35,39 +36,39 @@ import (
 
 		db := db.GetDB(c)
 
-		var game model.Game
-		result := db.First(&game, id)
+		var player model.Player
+		result := db.First(&player, id)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		c.IndentedJSON(http.StatusOK, game)
+		c.IndentedJSON(http.StatusOK, player)
 	}
 
-	func CreateGame(c *gin.Context){
-		var newGame model.Game
+	func CreateUser(c *gin.Context){
+		var newPlayer model.Player
 
 		// bind received JSON body to newAlbum
-		if err := c.BindJSON(&newGame); err != nil {
+		if err := c.BindJSON(&newPlayer); err != nil {
 			c.Error(err)
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
 		db := db.GetDB(c)
-		result := db.Create(&newGame)
+		result := db.Create(&newPlayer)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		c.IndentedJSON(http.StatusCreated, newGame)
+		c.IndentedJSON(http.StatusCreated, newPlayer)
 	}
 
-	func DeleteGameById(c *gin.Context){
+	func DeleteUserById(c *gin.Context){
 		idStr := c.Param("id")
 
 		id, err := strconv.Atoi(idStr)
@@ -79,7 +80,7 @@ import (
 		}
 
 		db := db.GetDB(c)
-		result := db.Where("id = ?", id).Delete(&model.Game{})
+		result := db.Where("id = ?", id).Delete(&model.Player{})
 
 		if result.Error != nil {
 			c.Error(result.Error)
@@ -89,17 +90,17 @@ import (
 		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("player with id %d deleted", id)})
 	}
 
-	func UpdateGameById(c *gin.Context){
-		var updatedGame model.Game
+	func UpdateUserById(c *gin.Context){
+		var updatedPlayer model.Player
 
-		if err := c.ShouldBindJSON(&updatedGame); err != nil {
+		if err := c.ShouldBindJSON(&updatedPlayer); err != nil {
 			c.Error(err)
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
 		db := db.GetDB(c)
-		result := db.Save(&updatedGame)
+		result := db.Save(&updatedPlayer)
 
 		if result.Error != nil {
 			c.JSON(http.StatusNotFound, gin.H{"message": "album not found"})
