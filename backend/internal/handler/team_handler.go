@@ -7,15 +7,12 @@ import (
 	"strconv"
 	"github.com/gin-gonic/gin"
 	"backend/internal/model"
-	"backend/internal/db"
+	"backend/internal/service"
 )
 
 
 	func GetTeams(c *gin.Context){
-		db := db.GetDB(c)
-
-		var teams []model.Team
-		result := db.Find(&teams)
+		result, teams := service.GetAllTeams(c)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
@@ -34,10 +31,7 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
-
-		var team model.Team
-		result := db.First(&team, id)
+		result, team := service.GetTeamByID(id, c)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
@@ -57,8 +51,7 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
-		result := db.Create(&newTeam)
+		result, newTeam := service.CreateTeam(newTeam, c)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
@@ -79,8 +72,7 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
-		result := db.Where("id = ?", id).Delete(&model.Team{})
+		result, _ := service.DeleteTeamById(id, c)
 
 		if result.Error != nil {
 			c.Error(result.Error)
@@ -90,7 +82,7 @@ import (
 		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("team with id %d deleted", id)})
 	}
 
-	func UpdateTeamById(c *gin.Context){
+	func UpdateTeam(c *gin.Context){
 		var updatedTeam model.Team
 
 		if err := c.ShouldBindJSON(&updatedTeam); err != nil {
@@ -98,13 +90,15 @@ import (
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-
-		db := db.GetDB(c)
-		result := db.Save(&updatedTeam)
+		result, updatedTeam := service.UpdateTeam(updatedTeam, c)
 
 		if result.Error != nil {
-			c.JSON(http.StatusNotFound, gin.H{"message": "album not found"})
+			c.Error(result.Error)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
 		}
+
+		c.IndentedJSON(http.StatusOK, updatedTeam)
 	}
 
 

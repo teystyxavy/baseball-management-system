@@ -3,38 +3,41 @@ package handler
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"backend/internal/model"
-	"backend/internal/db"
-	"backend/internal/middleware"
-
+	"backend/internal/dto"
+	"backend/internal/service"
 )
 
-func PerformLogin(c *gin.Context){
-	var input model.LoginInput
+func Login(c *gin.Context){
+	var input dto.LoginDTO
     if err := c.ShouldBindJSON(&input); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
 
-    // search against database of users
-	gormDB := db.GetDB(c)
-	var user model.User
-	result := gormDB.Where("name = ?", input.Username).First(&user)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "username does not exist"})
+	token, err := service.PerformLogin(input, c)
+	if err != nil {
+		c.Error(err)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.SetCookie("auth_token", token, 3600, "/", "localhost", false, true)
+}
 
-    if input.Password == user.Password { 
-        token, err := middleware.GenerateJWTToken(input.Username)
-        if err != nil {	
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
-            return
-        }
-        c.JSON(http.StatusOK, gin.H{"token": token})
-    } else {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+func RegisterUser(c *gin.Context){
+	var input dto.RegisterDTO
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
     }
+
+	err, newUser := service.PerformRegisterUser(input, c)
+	if err != nil {
+		c.Error(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, newUser)
 }
 
 func GetProfile(c *gin.Context){

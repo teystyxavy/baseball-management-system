@@ -1,14 +1,18 @@
 package model	
 
-import (
-	"gorm.io/gorm"
-)
 
 type Player struct {
-	gorm.Model
-	Name string `json:"name" gorm:"unique;not null"`
-	TeamID int `json:"team_id" gorm:"not null"`
-	GamesPlayed int `json:"games_played"`
-	BattingAverage float64 `json:"batting_average"`
-	OnBasePercentage float64 `json:"on_base_percentage"`
+    UserID         int `json:"user_id" gorm:"primaryKey;unique;not null"` // Foreign key to User, unique ensures 1-to-1
+    NumGamesPlayed int `json:"num_games_played"`
+    NumAtBats      int `json:"num_at_bats"`
+    NumSingles     int `json:"num_singles"`
+    NumOnBases     int `json:"num_on_bases"`
+    NumWalks       int `json:"num_walks"`
+    NumStrikeouts  int `json:"num_strikeouts"`
+    NumHomeRuns    int `json:"num_home_runs"`
+    NumDoubles     int `json:"num_doubles"`
+    NumTriples     int `json:"num_triples"`
+    NumGroundOuts  int `json:"num_ground_outs"`
+    NumFlyouts     int `json:"num_flyouts"`
+    NumRunsBroughtIn int `json:"num_runs_brought_in"`
 }

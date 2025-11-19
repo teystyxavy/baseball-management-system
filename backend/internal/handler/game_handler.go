@@ -6,15 +6,12 @@ import (
 	"strconv"
 	"github.com/gin-gonic/gin"
 	"backend/internal/model"
-	"backend/internal/db"
+	"backend/internal/service"
 )
 
 
-	func GetGame(c *gin.Context){
-		db := db.GetDB(c)
-
-		var games []model.Game
-		result := db.Find(&games)
+	func GetAllGames(c *gin.Context){
+		result, games := service.GetAllGames(c)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
@@ -33,10 +30,8 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
+		result, game := service.GetGameByID(id, c)
 
-		var game model.Game
-		result := db.First(&game, id)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
@@ -56,8 +51,8 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
-		result := db.Create(&newGame)
+		result, newGame := service.CreateGame(newGame, c)
+
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
@@ -78,15 +73,14 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
-		result := db.Where("id = ?", id).Delete(&model.Game{})
+		result, _ := service.GetGameByID(id, c)
 
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("player with id %d deleted", id)})
+		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("game with id %d deleted", id)})
 	}
 
 	func UpdateGameById(c *gin.Context){
@@ -98,11 +92,14 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
-		result := db.Save(&updatedGame)
+		result, updatedGame := service.UpdateGameById(updatedGame, c)
 
 		if result.Error != nil {
-			c.JSON(http.StatusNotFound, gin.H{"message": "album not found"})
+			c.Error(result.Error)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
 		}
+
+		c.IndentedJSON(http.StatusOK, updatedGame)
 	}
 

@@ -1,28 +1,26 @@
 package handler
 
-
 import (
 	"fmt"
 	"net/http"
 	"strconv"
 	"github.com/gin-gonic/gin"
 	"backend/internal/model"
-	"backend/internal/db"
+	"backend/internal/service"
+	"errors"
 )
 
 
 	func GetUsers(c *gin.Context){
-		db := db.GetDB(c)
-
-		var players []model.Player
-		result := db.Find(&players)
+		result, users := service.GetAllUsers(c)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c.IndentedJSON(http.StatusOK, players)
+		c.IndentedJSON(http.StatusOK, users)
 	}
+	
 
 	func GetUserByID(c *gin.Context){
 		idStr := c.Param("id")
@@ -34,38 +32,33 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
+		result, user := service.GetUserByID(id, c)
 
-		var player model.Player
-		result := db.First(&player, id)
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
 
-		c.IndentedJSON(http.StatusOK, player)
+		c.IndentedJSON(http.StatusOK, user)
 	}
 
 	func CreateUser(c *gin.Context){
-		var newPlayer model.Player
+		var newUser model.User
 
 		// bind received JSON body to newAlbum
-		if err := c.BindJSON(&newPlayer); err != nil {
+		if err := c.BindJSON(&newUser); err != nil {
 			c.Error(err)
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
+		result, returnUser := service.CreateUser(newUser, c)
 
-		db := db.GetDB(c)
-		result := db.Create(&newPlayer)
 		if result.Error != nil {
 			c.Error(result.Error)
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
+			c.AbortWithStatus(http.StatusBadRequest)
 		}
-
-		c.IndentedJSON(http.StatusCreated, newPlayer)
+		c.IndentedJSON(http.StatusCreated, returnUser)
 	}
 
 	func DeleteUserById(c *gin.Context){
@@ -79,31 +72,52 @@ import (
 			return
 		}
 
-		db := db.GetDB(c)
-		result := db.Where("id = ?", id).Delete(&model.Player{})
+		result, _ := service.DeleteUserById(id, c)
 
 		if result.Error != nil {
 			c.Error(result.Error)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("player with id %d deleted", id)})
+
+		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("user with id %d deleted", id)})
 	}
 
-	func UpdateUserById(c *gin.Context){
-		var updatedPlayer model.Player
+	func UpdateUser(c *gin.Context){
+		var updatedUser model.User
 
-		if err := c.ShouldBindJSON(&updatedPlayer); err != nil {
+		if err := c.ShouldBindJSON(&updatedUser); err != nil {
 			c.Error(err)
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		db := db.GetDB(c)
-		result := db.Save(&updatedPlayer)
+		result, updatedUser := service.UpdateUser(updatedUser, c)
 
 		if result.Error != nil {
-			c.JSON(http.StatusNotFound, gin.H{"message": "album not found"})
+			c.Error(result.Error)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
 		}
+		c.IndentedJSON(http.StatusOK, updatedUser)
+	}
+
+	func GetUserByName(c *gin.Context){
+		name := c.Query("name")
+
+		if len(name) == 0 {
+			c.Error(errors.New("name cannot be empty"))
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		result, user := service.GetUserByName(name, c)
+
+		if result.Error != nil {
+			c.Error(result.Error)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		c.IndentedJSON(http.StatusOK, user)	
 	}
 
