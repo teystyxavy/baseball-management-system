@@ -3,6 +3,8 @@ package model
 
 type Player struct {
     UserID         int `json:"user_id" gorm:"primaryKey;unique;not null"` // Foreign key to User, unique ensures 1-to-1
+    JerseyNumber   int `json:"jersey_number"`
+    Position       string `json:"position"`
     NumGamesPlayed int `json:"num_games_played"`
     NumAtBats      int `json:"num_at_bats"`
     NumSingles     int `json:"num_singles"`
