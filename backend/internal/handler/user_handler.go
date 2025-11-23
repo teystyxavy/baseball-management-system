@@ -8,7 +8,13 @@ import (
 	"backend/internal/model"
 	"backend/internal/service"
 	"errors"
+	"strings"
 )
+
+
+	func isValidEmail(email string) bool {
+		return strings.Contains(email, "@")
+	}
 
 
 	func GetUsers(c *gin.Context){
@@ -33,6 +39,26 @@ import (
 		}
 
 		result, user := service.GetUserByID(id, c)
+
+		if result.Error != nil {
+			c.Error(result.Error)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		c.IndentedJSON(http.StatusOK, user)
+	}
+
+	func GetUserByEmail(c *gin.Context){
+		email := c.Query("email")
+
+		if !isValidEmail(email) {
+			c.Error(errors.New("email is not valid"))
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		result, user := service.GetUserByEmail(email, c)
 
 		if result.Error != nil {
 			c.Error(result.Error)

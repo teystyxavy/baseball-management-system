@@ -1,8 +1,11 @@
 package model	
 
-
+import (
+    "gorm.io/gorm"
+)
 type Player struct {
-    UserID         int `json:"user_id" gorm:"primaryKey;unique;not null"` // Foreign key to User, unique ensures 1-to-1
+    gorm.Model
+    Name          string `json:"name" gorm:"not null"`
     JerseyNumber   int `json:"jersey_number"`
     Position       string `json:"position"`
     NumGamesPlayed int `json:"num_games_played"`
@@ -17,4 +20,6 @@ type Player struct {
     NumGroundOuts  int `json:"num_ground_outs"`
     NumFlyouts     int `json:"num_flyouts"`
     NumRunsBroughtIn int `json:"num_runs_brought_in"`
+    TeamID         int `json:"team_id" gorm:"not null"`
+    Team           Team `json:"team" gorm:"foreignKey:TeamID"`
 }

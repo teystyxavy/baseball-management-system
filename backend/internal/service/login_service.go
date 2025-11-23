@@ -24,14 +24,14 @@ func checkPassword(hashedPassword, password string) bool {
 func PerformLogin(input dto.LoginDTO, c *gin.Context) (string, error) {
 	gormDB := db.GetDB(c)
 	var user model.User
-	result := gormDB.Where("name = ?", input.Username).First(&user)
+	result := gormDB.Where("email = ?", input.Email).First(&user)
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "username does not exist"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "email does not exist"})
 		return "", fmt.Errorf("username does not exist")
 	}
 
     if checkPassword(user.Password, input.Password) { 
-        token, err := middleware.GenerateJWTToken(input.Username)
+        token, err := middleware.GenerateJWTToken(user.Name)
 		return token, err
 	} else {
 		return "", fmt.Errorf("invalid password")
@@ -63,8 +63,7 @@ func PerformRegisterUser(registerDTO dto.RegisterDTO, c *gin.Context) (error, mo
 	}
 
 	user.Password = hashedPassword
-	user.TeamID = registerDTO.TeamID
-
+	user.IsAdmin = registerDTO.IsAdmin
 	result := gormDB.Create(&user)
 	return result.Error, user
 }

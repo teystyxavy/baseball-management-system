@@ -43,7 +43,7 @@ func createTestEngine() *gin.Engine {
 func TestLogin(t *testing.T) {
 	router := createTestEngine()
 	w := httptest.NewRecorder()
-	testLoginDTO := dto.LoginDTO{Username: "xavier", Password: "password"}
+	testLoginDTO := dto.LoginDTO{Email: "xavier@gmail.com", Password: "password"}
 	requestBody, _ := json.Marshal(testLoginDTO)
 	req, _ := http.NewRequest("POST", "/login", strings.NewReader(string(requestBody)))
 	router.ServeHTTP(w, req)

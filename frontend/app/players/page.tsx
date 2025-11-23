@@ -5,141 +5,30 @@ import {Button} from "@/components/ui/button";
 import {PlayerCard, Player} from "@/components/player-card";
 import {useEffect, useState} from "react";
 
-// const samplePlayers = [
-//   {
-//     id: 1,
-//     name: "John Smith",
-//     position: "Pitcher",
-//     number: 12,
-//     team: "Thunder",
-//     stats: {
-//       avg: 0.321,
-//       hr: 20,
-//       rbi: 50,
-//       atBats: 450,
-//       singles: 110,
-//       doubles: 18,
-//       triples: 3,
-//       obp: 0.360,
-//     },
-//   },
-//   {
-//     id: 2,
-//     name: "Mike Johnson",
-//     position: "Catcher",
-//     number: 5,
-//     team: "Thunder",
-//     stats: {
-//       avg: 0.312,
-//       hr: 15,
-//       rbi: 58,
-//       atBats: 420,
-//       singles: 95,
-//       doubles: 18,
-//       triples: 3,
-//       obp: 0.345,
-//     },
-//   },
-//   {
-//     id: 3,
-//     name: "David Brown",
-//     position: "Outfield",
-//     number: 7,
-//     team: "Stars",
-//     stats: {
-//       avg: 0.298,
-//       hr: 12,
-//       rbi: 45,
-//       atBats: 400,
-//       singles: 85,
-//       doubles: 15,
-//       triples: 7,
-//       obp: 0.335,
-//     },
-//   },
-//   {
-//     id: 4,
-//     name: "Chris Lee",
-//     position: "Infield",
-//     number: 3,
-//     team: "Thunder",
-//     stats: {
-//       avg: 0.275,
-//       hr: 5,
-//       rbi: 28,
-//       atBats: 380,
-//       singles: 78,
-//       doubles: 16,
-//       triples: 5,
-//       obp: 0.315,
-//     },
-//   },
-//   {
-//     id: 5,
-//     name: "Robert Wilson",
-//     position: "Pitcher",
-//     number: 22,
-//     team: "Stars",
-//     stats: {
-//       avg: 0.0,
-//       hr: 0,
-//       rbi: 0,
-//       atBats: 20,
-//       singles: 0,
-//       doubles: 0,
-//       triples: 0,
-//       obp: 0.000,
-//     },
-//   },
-//   {
-//     id: 6,
-//     name: "James Garcia",
-//     position: "Outfield",
-//     number: 9,
-//     team: "Giants",
-//     stats: {
-//       avg: 0.301,
-//       hr: 18,
-//       rbi: 62,
-//       atBats: 460,
-//       singles: 105,
-//       doubles: 14,
-//       triples: 11,
-//       obp: 0.345,
-//     },
-//   },
-// ];
-
-
-function setPlayerData(jsonResponse) : Player[] {
-  let players = [] as Player[];
-  for (let i = 0; i < jsonResponse.length; i++) {
-    players.push({
-      id: jsonResponse[i].id,
-      name: jsonResponse[i].name,
-      position: jsonResponse[i].position,
-      number: jsonResponse[i].number,
-      team: jsonResponse[i].team,
-      stats: {
-        avg: (jsonResponse[i].num_singles + jsonResponse[i].num_doubles + jsonResponse[i].num_triples + jsonResponse[i].num_home_runs) / jsonResponse[i].num_at_bats,
-        hr: jsonResponse[i].num_home_runs,
-        rbi: jsonResponse[i].num_runs_brought_in,
-        singles: jsonResponse[i].num_singles,
-        doubles: jsonResponse[i].num_doubles,
-        triples: jsonResponse[i].num_triples,
-        atBats: jsonResponse[i].num_at_bats,
-        obp: jsonResponse[i].num_on_bases / jsonResponse[i].num_at_bats,
-      },
-    });
+function transformPlayerData(apiData: any): Player {
+  return {
+    id: apiData.id,
+    name: apiData.name,
+    position: apiData.position,
+    jerseyNumber: apiData.jersey_number,
+    atBats: apiData.num_at_bats,
+    singles: apiData.num_singles,
+    doubles: apiData.num_doubles,
+    triples: apiData.num_triples,
+    obp: apiData.num_on_bases / apiData.num_at_bats,
+    avg: apiData.num_at_bats > 0 
+      ? (apiData.num_singles + apiData.num_doubles + apiData.num_triples + apiData.num_home_runs) / apiData.num_at_bats 
+      : 0,
+    hr: apiData.num_home_runs,
+    rbi: apiData.num_runs_brought_in,
+    teamName: apiData.team.name
   }
-  return players;
 }
-
 
 export default function PlayersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPosition, setPosition] = useState("");
-  const [selectedTeam, setTeams] = useState("");
+  const [selectedLeague, setLeagues] = useState("");
   const [players, setPlayers] = useState<Player[]>([]);
 
  useEffect(() => {
@@ -148,7 +37,8 @@ export default function PlayersPage() {
       const response = await fetch('http://localhost:8080/players');
       if (!response.ok) throw new Error('Failed to fetch players');
       const data = await response.json();
-      setPlayers(setPlayerData(data));
+      const transformedPlayers = data.map(transformPlayerData);
+      setPlayers(transformedPlayers);
     } catch (error) {
       console.error('Error fetching players:', error);
     }
@@ -156,13 +46,14 @@ export default function PlayersPage() {
   
   fetchPlayers();
 }, []);
-  // filter players based on search term, will be replaced by call to backend
+
   const filteredPlayers = players.filter((player : Player) => {
-    const playerSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const playerSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase()) || player.teamName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPosition = player.position.toLowerCase().includes(selectedPosition.toLowerCase());
-    const matchesTeams = player.team.toLowerCase().includes(selectedTeam.toLowerCase());
-    return matchesPosition && playerSearch && matchesTeams;
+    //const matchesLeague = player.teamName.toLowerCase().includes(selectedLeague.toLowerCase());
+    return matchesPosition && playerSearch // && matchesTeams;
   });
+
     return (
         <>
             <Navigation/>
@@ -180,7 +71,7 @@ export default function PlayersPage() {
                     <div className="flex flex-col md:flex-row gap-4 mb-8">
                         <input
                             type="text"
-                            placeholder="Search players..."
+                            placeholder="Search players or teams..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="flex-1 px-4 py-2 bg-card border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -192,12 +83,15 @@ export default function PlayersPage() {
                             <option value="">All Positions</option>
                             <option value="pitcher">Pitcher</option>
                             <option value="catcher">Catcher</option>
-                            <option value="Infield">Infield</option>
-                            <option value="outfield">Outfield</option>
+                            <option value="shortstop">Shortstop</option>
+                            <option value="third base">Third Base</option>
+                            <option value="first base">First Base</option>
+                            <option value="second base">Second Base</option>
+                            <option value="outfielder">Outfielder</option>
                         </select>
                         <select
-                          value={selectedTeam}
-                          onChange={(e) => setTeams(e.target.value)}
+                          value={selectedLeague}
+                          onChange={(e) => setLeagues(e.target.value)}
                           className="px-4 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
                             <option value="">All Teams</option>
                             <option value="thunder">Thunder</option>

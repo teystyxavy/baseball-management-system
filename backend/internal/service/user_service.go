@@ -11,14 +11,14 @@ func GetAllUsers(c *gin.Context) (*gorm.DB, []model.User) {
 	gormDB := db.GetDB(c)
 
 	var players []model.User
-	result := gormDB.Preload("Team").Preload("Player").Find(&players)
+	result := gormDB.Find(&players)
 	return result, players
 }
 
 func GetUserByID(id int, c *gin.Context) (*gorm.DB, model.User) {
 	gormDB := db.GetDB(c)
 	var user model.User
-	result := gormDB.Preload("Team").Preload("Player").First(&user, id)
+	result := gormDB.First(&user, id)
 	return result, user
 }
 
@@ -43,7 +43,14 @@ func UpdateUser(updatedUser model.User, c *gin.Context) (*gorm.DB, model.User) {
 func GetUserByName(name string, c *gin.Context) (*gorm.DB, model.User) {
 	gormDB := db.GetDB(c)
 	var user model.User
-	result := gormDB.Where("name = ?", name).Preload("Team").Preload("Player").First(&user)
+	result := gormDB.Where("name = ?", name).First(&user)
+	return result, user
+}
+
+func GetUserByEmail(email string, c *gin.Context) (*gorm.DB, model.User) {
+	gormDB := db.GetDB(c)
+	var user model.User
+	result := gormDB.Where("email = ?", email).First(&user)
 	return result, user
 }
 

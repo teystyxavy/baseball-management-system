@@ -6,25 +6,26 @@ import (
 
 // protected routes are be create, update and delete
 func SetProtectedRoutes(routerGroup *gin.RouterGroup) {
-	routerGroup.POST("/players", CreatePlayer)
-	routerGroup.DELETE("/players/:id", DeletePlayerById)
-	routerGroup.PUT("/players/:id", UpdatePlayerById)
+	routerGroup.POST("/player", CreatePlayer)
+	routerGroup.POST("/players", CreatePlayers)
+	routerGroup.DELETE("/player/:id", DeletePlayerById)
+	routerGroup.PUT("/player/:id", UpdatePlayerById)
 
-	routerGroup.POST("/games", CreateGame)
-	routerGroup.DELETE("/games/:id", DeleteGameById)
-	routerGroup.PUT("/games/:id", UpdateGameById)
+	routerGroup.POST("/game", CreateGame)
+	routerGroup.DELETE("/game/:id", DeleteGameById)
+	routerGroup.PUT("/game/:id", UpdateGameById)
 
-	routerGroup.POST("/teams", CreateTeam)
-	routerGroup.DELETE("/teams/:id", DeleteTeamById)
-	routerGroup.PUT("/teams/:id", UpdateTeam)
+	routerGroup.POST("/team", CreateTeam)
+	routerGroup.DELETE("/team/:id", DeleteTeamById)
+	routerGroup.PUT("/team/:id", UpdateTeam)
 
-	routerGroup.POST("/users", CreateUser)
-	routerGroup.DELETE("/users/:id", DeleteUserById)
-	routerGroup.PUT("/users/:id", UpdateUser)
+	routerGroup.POST("/user", CreateUser)
+	routerGroup.DELETE("/user/:id", DeleteUserById)
+	routerGroup.PUT("/user/:id", UpdateUser)
 
-	routerGroup.POST("/at-bats", CreateAtBat)
-	routerGroup.DELETE("/at-bats/:id", DeleteAtBatById)
-	routerGroup.PUT("/at-bats/:id", UpdateAtBat)
+	routerGroup.POST("/at-bat", CreateAtBat)
+	routerGroup.DELETE("/at-bat/:id", DeleteAtBatById)
+	routerGroup.PUT("/at-bat/:id", UpdateAtBat)
 }
 
 func SetPublicRoutes(router *gin.Engine) {
@@ -32,20 +33,20 @@ func SetPublicRoutes(router *gin.Engine) {
 	router.POST("/register", RegisterUser) // register route to generate JWT token
 
 	router.GET("/players", GetPlayers)
-	router.GET("/players/:id", GetPlayerByID)
+	router.GET("/player/:id", GetPlayerByID)
 
 	router.GET("/games", GetAllGames)
-	router.GET("/games/:id", GetGameByID)
+	router.GET("/game/:id", GetGameByID)
 
 	router.GET("/teams", GetTeams)
-	router.GET("/teams/:id", GetTeamByID)
+	router.GET("/team/:id", GetTeamByID)
 
 	router.GET("/users/all", GetUsers)	
-	router.GET("/users/:id", GetUserByID)
-	router.GET("/users", GetUserByName) // /users?name=xavier
+	router.GET("/user/:id", GetUserByID)
+	router.GET("/user", GetUserByEmail)
 
 	router.GET("/at-bats", GetAtBats)
-	router.GET("/at-bats/player/:id", GetAtBatsByPlayerID)
-	router.GET("/at-bats/:player_id/:game_id", GetAtBatsByPlayerIDAndGameID)
+	router.GET("/at-bat/player/:id", GetAtBatsByPlayerID)
+	router.GET("/at-bat/:player_id/:game_id", GetAtBatsByPlayerIDAndGameID)
 }
 

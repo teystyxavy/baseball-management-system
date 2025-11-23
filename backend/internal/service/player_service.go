@@ -11,7 +11,7 @@ func GetAllPlayers(c *gin.Context) (*gorm.DB, []model.Player) {
 	gormDB := db.GetDB(c)
 
 	var players []model.Player
-	result := gormDB.Find(&players)
+	result := gormDB.Preload("Team").Find(&players)
 	return result, players
 }
 
@@ -38,4 +38,10 @@ func UpdatePlayer(updatedPlayer model.Player, c *gin.Context) (*gorm.DB, model.P
 	gormDB := db.GetDB(c)
 	result := gormDB.Save(&updatedPlayer)		
 	return result, updatedPlayer
+}
+
+func CreatePlayers(players *[]model.Player, c *gin.Context) *gorm.DB{
+	gormDB := db.GetDB(c)
+	result := gormDB.Create(&players)
+	return result
 }

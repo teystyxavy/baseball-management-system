@@ -60,6 +60,25 @@ import (
 		c.IndentedJSON(http.StatusCreated, newPlayer)
 	}
 
+	func CreatePlayers(c *gin.Context){
+		var newPlayers []model.Player
+
+		// bind received JSON body to newAlbum
+		if err := c.BindJSON(&newPlayers); err != nil {
+			c.Error(err)
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		result := service.CreatePlayers(&newPlayers, c)
+		if result.Error != nil {
+			c.Error(result.Error)
+			c.AbortWithStatus(http.StatusBadRequest)
+		}
+
+		c.IndentedJSON(http.StatusCreated, newPlayers)
+	}
+
 	func DeletePlayerById(c *gin.Context){
 		idStr := c.Param("id")
 

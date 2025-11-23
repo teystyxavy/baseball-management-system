@@ -10,6 +10,15 @@ interface Team {
   founded: number
 }
 
+function getDate(date: number) {
+  const dateObj = new Date(date)
+  return dateObj.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
 export function TeamCard({ team }: { team: Team }) {
   const winPercentage = ((team.wins / (team.wins + team.losses)) * 100).toFixed(1)
 
@@ -42,7 +51,7 @@ export function TeamCard({ team }: { team: Team }) {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Founded</span>
-          <span className="font-semibold text-foreground">{team.founded}</span>
+          <span className="font-semibold text-foreground">{getDate(team.founded)}</span>
         </div>
       </div>
 
