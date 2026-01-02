@@ -4,6 +4,7 @@ import {Navigation} from "@/components/navigation";
 import {Button} from "@/components/ui/button";
 import {PlayerCard, Player} from "@/components/player-card";
 import {useEffect, useState} from "react";
+import Link from "next/link";
 
 function transformPlayerData(apiData: any): Player {
   return {
@@ -65,7 +66,9 @@ export default function PlayersPage() {
                         <h1 className="text-4xl font-bold text-foreground mb-2">Players</h1>
                         <p className="text-muted-foreground">Manage and view all registered players</p>
                         </div>
-                        <Button className="mt-4 md:mt-0">+ Add Player</Button>
+                        <Link href='/players/new'>
+                          <Button className="mt-4 md:mt-0">+ Add Player</Button>
+                        </Link>
                     </div>
                     {/*Search and Filter */}
                     <div className="flex flex-col md:flex-row gap-4 mb-8">

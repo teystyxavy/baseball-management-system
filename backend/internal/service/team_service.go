@@ -38,3 +38,9 @@ func UpdateTeam(updatedTeam model.Team, c *gin.Context) (*gorm.DB, model.Team){
 	result := db.Save(&updatedTeam)
 	return result, updatedTeam
 }
+
+func CreateTeams(newTeams []model.Team, c *gin.Context) (*gorm.DB, []model.Team){
+	db := db.GetDB(c)
+	result := db.Create(&newTeams)
+	return result, newTeams
+}

@@ -16,6 +16,7 @@ func SetProtectedRoutes(routerGroup *gin.RouterGroup) {
 	routerGroup.PUT("/game/:id", UpdateGameById)
 
 	routerGroup.POST("/team", CreateTeam)
+	routerGroup.POST("/teams", CreateTeams)
 	routerGroup.DELETE("/team/:id", DeleteTeamById)
 	routerGroup.PUT("/team/:id", UpdateTeam)
 

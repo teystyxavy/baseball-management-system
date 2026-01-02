@@ -61,6 +61,23 @@ import (
 		c.IndentedJSON(http.StatusCreated, newTeam)
 	}
 
+	func CreateTeams(c *gin.Context){
+		var newTeams []model.Team
+		if err := c.ShouldBindJSON(&newTeams); err != nil {
+			c.Error(err)
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+		result, newTeams := service.CreateTeams(newTeams, c)
+
+		if result.Error != nil {
+			c.Error(result.Error)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		c.IndentedJSON(http.StatusCreated, newTeams)
+	}
+
 	func DeleteTeamById(c *gin.Context){
 		idStr := c.Param("id")
 
