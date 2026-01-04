@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { ImageWithFallback } from "@/components/image-with-fallback"
 
 interface Team {
   id: number
@@ -8,6 +9,7 @@ interface Team {
   losses: number
   playerCount: number
   founded: number
+  logo?: string
 }
 
 function getDate(date: number) {
@@ -27,7 +29,14 @@ export function TeamCard({ team }: { team: Team }) {
       {/* Team Header */}
       <div className="mb-4">
         <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-          <span className="text-2xl font-bold text-primary-foreground">{team.name[0]}</span>
+          <ImageWithFallback
+            src={team.logo || "/placeholder.svg"}
+            alt={team.name}
+            width={64}
+            height={64}
+            className="object-cover"
+            fallback={<span className="text-2xl font-bold text-primary-foreground">{team.name[0]}</span>}
+          />
         </div>
         <h3 className="text-2xl font-bold text-foreground">{team.name}</h3>
         <p className="text-sm text-muted-foreground">{team.city}</p>

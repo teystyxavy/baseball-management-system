@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { ImageWithFallback } from "@/components/image-with-fallback";
+import { User } from "lucide-react";
+
 
 export interface Player {
+    image?: string | null,
     id: number,
     name: string,
     position: string,
@@ -22,12 +26,19 @@ export function PlayerCard({ player }: { player: Player }) {
     <div className="bg-card border border-border rounded-lg p-6 hover:border-accent transition-colors group">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-lg">
-            {player.jerseyNumber}
+          <div className="relative w-12 h-12 rounded-full overflow-hidden bg-muted flex items-center justify-center">
+            <ImageWithFallback
+              src={player.image || "/placeholder.svg"}
+              alt={player.name}
+              width={48}
+              height={48}
+              className="object-cover"
+              fallback={<User className="w-6 h-6 text-muted-foreground" />}
+            />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground">{player.name}</h3>
-            <p className="text-sm text-muted-foreground">{player.position}</p>
+            <p className="text-sm text-muted-foreground">#{player.jerseyNumber} {player.position}</p>
           </div>
         </div>
       </div>
