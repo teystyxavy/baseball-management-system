@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
+import { ProfileDropdown } from "@/components/profile-dropdown"
+import { useState } from "react"
 
 const navItems = [
   { href: "/", label: "Home" },

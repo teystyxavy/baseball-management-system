@@ -8,5 +8,5 @@ import (
 func main() {
 	gormDB := db.ConnectToDB()
 	router := setup.InitRouter(gormDB)
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }

@@ -38,10 +38,46 @@ export default function AddPlayer() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add your submission logic here
+    
+    try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('authToken='))?.split('=')[1];
+      if (!token) {
+        alert("You must be logged in to add a player.");
+        return;
+      } 
+      const response = await fetch('http://localhost:8080/api/player', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include', // Include cookies in request
+        body: JSON.stringify(formData)
+      });
+      if (!response.ok) throw new Error('HTTP error! Status:' + response.status);
+      const data = await response.json();
+      console.log("Player added successfully:", data);
+      // Reset form after successful submission
+      setFormData({
+        playerNumber: '',
+        playerName: '',
+        position: 'Pitcher',
+        team: '',
+        atBats: '',
+        singles: '',
+        doubles: '',
+        triples: '',
+        obp: '',
+        hr: '',
+        rbi: '',
+        avg: ''
+      });
+    } catch (error) {
+      console.error('Error adding player:', error);
+      alert("Failed to add player. Please try again.");
+    }
   };
 
   return (

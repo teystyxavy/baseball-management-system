@@ -31,17 +31,27 @@ func GetDB(c *gin.Context) *gorm.DB {
 func ConnectToDB() *gorm.DB {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("No .env file loaded or error loading .env (continuing with env vars)")
 	}
 
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	dbHost := os.Getenv("HOSTNAME")
-	port := os.Getenv("PORT")
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost == "" {
+		dbHost = os.Getenv("HOSTNAME")
+	}
+	port := os.Getenv("DB_PORT")
+	if port == "" {
+		port = os.Getenv("PORT")
+	}
+	if port == "" {
+		port = "5432"
+	}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Singapore",
 						dbHost, dbUser, dbPassword, dbName, port)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
