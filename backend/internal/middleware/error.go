@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 func ErrorHandler() gin.HandlerFunc {
@@ -10,8 +10,12 @@ func ErrorHandler() gin.HandlerFunc {
 		c.Next() // process request first
 
 		if len(c.Errors) > 0 {
-			err := c.Errors.Last().Err
-			c.JSON(http.StatusInternalServerError, map[string]any{
+			err := c.Errors.Last()
+			statusCode := c.Writer.Status()
+			if statusCode == http.StatusOK {
+				statusCode = http.StatusInternalServerError
+			}
+			c.JSON(statusCode, map[string]any{
                 "success": false,
                 "message": err.Error(),
             })

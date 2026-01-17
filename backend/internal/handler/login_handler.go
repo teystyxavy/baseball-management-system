@@ -17,7 +17,6 @@ func Login(c *gin.Context){
 	token, err := service.PerformLogin(input, c)
 	if err != nil {
 		c.Error(err)
-		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"token": token})
@@ -34,18 +33,15 @@ func RegisterUser(c *gin.Context){
 	err, newUser := service.PerformRegisterUser(input, c)
 	if err != nil {
 		c.Error(err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.Abort()
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, newUser)
-}
 
-func GetProfile(c *gin.Context){
-	// Access username from context after successful authentication
-	username, _ := c.Get("username")
-	c.JSON(http.StatusOK, gin.H{"message": "Welcome to your profile, " + username.(string)})
-}
+	var output dto.RegisterResponseDTO
+	output.Email = newUser.Email
+	output.Name = newUser.Name
+	output.IsAdmin = newUser.IsAdmin
+	output.IsManager = newUser.IsManager
 
-func GetDashboard(c *gin.Context){
-	c.JSON(http.StatusOK, gin.H{"message": "This is your dashboard!"})
+	c.IndentedJSON(http.StatusCreated, output)
 }

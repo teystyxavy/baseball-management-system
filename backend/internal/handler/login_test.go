@@ -40,7 +40,44 @@ func createTestEngine() *gin.Engine {
 	return router
 }
 
-func TestLogin(t *testing.T) {
+func TestRegisterUser_Fail(t *testing.T) {
+	router := createTestEngine()
+	w := httptest.NewRecorder()
+	testRegisterDTO := dto.RegisterDTO{Name: "xavier", Email: "xavier@gmail.com", Password: "password"}
+	requestBody, _ := json.Marshal(testRegisterDTO)
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(string(requestBody)))
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "username already exists", response["message"])
+}
+
+func TestRegisterUser_Success(t *testing.T) {
+	router := createTestEngine()
+	w := httptest.NewRecorder()
+	name := "1"
+	email := name + "@gmail.com"
+	password := "password"
+	testRegisterDTO := dto.RegisterDTO{Name: name, Email: email, Password: password}
+	requestBody, _ := json.Marshal(testRegisterDTO)
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(string(requestBody)))
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, name, response["name"])
+	assert.Equal(t, email, response["email"])
+	assert.NotContains(t, response, "password")
+}
+
+
+func TestLogin_Success(t *testing.T) {
 	router := createTestEngine()
 	w := httptest.NewRecorder()
 	testLoginDTO := dto.LoginDTO{Email: "xavier@gmail.com", Password: "password"}
@@ -48,17 +85,8 @@ func TestLogin(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/login", strings.NewReader(string(requestBody)))
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
-
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Contains(t, response, "token")
 }
-
-func TestRegisterUser(t *testing.T) {
-	router := createTestEngine()
-	w := httptest.NewRecorder()
-	testRegisterDTO := dto.RegisterDTO{Name: "dorcas", Email: "dorcas@gmail.com", Password: "password"}
-	requestBody, _ := json.Marshal(testRegisterDTO)
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(string(requestBody)))
-	router.ServeHTTP(w, req)
-	assert.Equal(t, http.StatusCreated, w.Code)
-	assert.Equal(t, "User dorcas created successfully", w.Body.String())
-}
-
