@@ -30,6 +30,8 @@ export default function Login() {
             const data = await response.json()
             localStorage.setItem("token", data.token)
             localStorage.setItem("currentEmail", email)
+            localStorage.setItem("isLoggedIn", JSON.stringify(true))
+            localStorage.setItem("image", "empty_profile.png")
             alert("Login successful, bringing you back to home")
             // redirect to home page (no need to reset loading state)
             window.location.href = "/"

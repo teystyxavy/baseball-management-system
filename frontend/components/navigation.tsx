@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { ProfileDropdown } from "@/components/profile-dropdown"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -21,6 +21,32 @@ const authItems = [
 
 export function Navigation() {
   const pathname = usePathname()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState({
+    name:"",
+    email:"",
+    image:""
+  })
+
+  useEffect(() => {
+    // All localStorage access happens here, client-side only
+    const isLoggedIn = localStorage.getItem("isLoggedIn")
+    if (isLoggedIn != null && JSON.parse(isLoggedIn)) {
+      setIsAuthenticated(true)
+      setUser({
+        name: localStorage.getItem("email") || "",
+        email: localStorage.getItem("email") || "",
+        image: localStorage.getItem("image") || ""
+      })
+    }
+  }, [])
+  
+
+  const handleLogout = () => {
+    setIsAuthenticated(false)
+    localStorage.clear()
+  }
+
   return (
     <nav className="bg-card border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -52,17 +78,22 @@ export function Navigation() {
 
           {/* Authentication Links */}
           <div className="flex items-center gap-2">
-            {authItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={item.href === "/login" ? "outline" : "default"}
-                  size="sm"
-                  className="text-xs sm:text-sm"
-                >
-                  {item.label}
-                </Button>
-              </Link>
-            ))}
+            {isAuthenticated? (
+              <ProfileDropdown user={user} onLogout={handleLogout}/>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="outline" size="sm" className="text-xs sm:text-sm bg-transparent">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" className="text-xs sm:text-sm">
+                    Register
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

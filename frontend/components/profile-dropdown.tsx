@@ -15,9 +15,9 @@ import { User, Settings, CreditCard, LogOut } from "lucide-react"
 
 interface ProfileDropdownProps {
     user: {
-        name: string
-        email: string
-        image?: string
+        name: string | null
+        email: string | null
+        image: string | null
     }
     onLogout?: () => void
 }
@@ -49,7 +49,7 @@ export function ProfileDropdown({user, onLogout} : ProfileDropdownProps) {
                     </Avatar>
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-56 bg-background">
                 <DropdownMenuLabel className="block px-4 py-2 text-sm text-muted-foreground">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">{user.name}</p>
