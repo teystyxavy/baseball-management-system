@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"unicode"
 )
 
 func hashPassword(password string) (string, error) {
@@ -20,6 +21,26 @@ func checkPassword(hashedPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err == nil
 }
+
+func isPasswordValid(password string) bool { // password must be at least 8 chars, contain 1 lower and uppercase letter, and contain a special character
+	validLength := len(password) > 8
+	containsLower := false
+	containsUpper := false
+	containsSymbol := false
+	for _, r := range password {
+		if unicode.IsLower(r) {
+			containsLower = true
+		}
+		if unicode.IsUpper(r) {
+			containsUpper = true
+		}
+		if unicode.IsSymbol(r) {
+			containsSymbol = true
+		}
+	}
+
+	return validLength && containsLower && containsUpper && containsSymbol
+}	
 
 func PerformLogin(input dto.LoginDTO, c *gin.Context) (string, error) {
 	gormDB := db.GetDB(c)
@@ -48,8 +69,11 @@ func PerformRegisterUser(registerDTO dto.RegisterDTO, c *gin.Context) (error, mo
 	}
 	emailResult := gormDB.Where("email = ?", registerDTO.Email).First(&user)
 	if emailResult.Error == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "email already exists"})
 		return fmt.Errorf("email already exists"), model.User{}
+	}
+
+	if (!isPasswordValid(registerDTO.Password)) {
+		return fmt.Errorf("Password must be at least 8 chars long, and contain 1 lowercase, uppercase and special character"), model.User{}
 	}
 
 	// create new user in the DB
@@ -63,17 +87,7 @@ func PerformRegisterUser(registerDTO dto.RegisterDTO, c *gin.Context) (error, mo
 	}
 
 	user.Password = hashedPassword
-	user.IsAdmin = registerDTO.IsAdmin
+	user.Role = registerDTO.Role
 	result := gormDB.Create(&user)
 	return result.Error, user
 }
-
-// func GetProfile(c *gin.Context){
-// 	// Access username from context after successful authentication
-// 	username, _ := c.Get("username")
-// 	c.JSON(http.StatusOK, gin.H{"message": "Welcome to your profile, " + username.(string)})
-// }
-
-// func GetDashboard(c *gin.Context){
-// 	c.JSON(http.StatusOK, gin.H{"message": "This is your dashboard!"})
-// }

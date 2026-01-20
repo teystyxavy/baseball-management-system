@@ -65,10 +65,6 @@ export function ProfileDropdown({user, onLogout} : ProfileDropdownProps) {
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { router.push("/account") }} className="cursor-pointer">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    <span>Manage Account</span>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
           <LogOut className="mr-2 h-4 w-4" />

@@ -12,11 +12,49 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [emailError, setEmailError] = useState("")
+  const [passwordError, setPasswordError] = useState("")
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value
+    setFormData({
+      ...formData,
+      email: email,
+    })
+
+    // Custom validation
+    if (email && !email.includes('@')) {
+      setEmailError("Email must contain '@' symbol")
+    } else if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      setEmailError("Please enter a valid email address")
+    } else {
+      setEmailError("")
+    }
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const password = e.target.value
+    setFormData({
+      ...formData,
+      password: password,
+    })
+
+    // Custom validation
+    if (password && password.length < 8) {
+      setPasswordError("Password must contain at least 8 characters")
+    } else if (password && !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/
+)) {
+      setPasswordError("Password must contain at least 1 lowercase, uppercase and special character")
+    } else {
+      setPasswordError("")
+    }
+  }
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -52,8 +90,9 @@ export default function RegisterPage() {
             alert("User " + data.name + " created successfully, please login")
             window.location.href = "/login"
         } else {
-            setIsLoading(false)
-            alert("Invalid username or password")
+          const errorData = await response.json()
+          setIsLoading(false)
+          alert(errorData.message || "error occured when registering, please try again")
         }
     } catch (error) {            
         setIsLoading(false)
@@ -110,11 +149,16 @@ export default function RegisterPage() {
               name="email"
               type="email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={handleEmailChange}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className={`w-full px-4 py-2 bg-background border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 ${
+                emailError? 'border-destructive focus:ring-destructive':'border-border focus:ring-primary'
+              }`}
             />
+            {emailError && (
+              <p className="mt-1 text-sm text-destructive">{emailError}</p>
+            )}
           </div>
 
           {/* Password Field */}
@@ -127,11 +171,16 @@ export default function RegisterPage() {
               name="password"
               type="password"
               value={formData.password}
-              onChange={handleChange}
+              onChange={handlePasswordChange}
               placeholder="••••••••"
               required
-              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+              className={`w-full px-4 py-2 bg-background border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 ${
+                passwordError? 'border-destructive focus:ring-destructive':'border-border focus:ring-primary'
+              }`}
+              />
+              {passwordError && (
+              <p className="mt-1 text-sm text-destructive">{passwordError}</p>
+            )}
           </div>
 
           {/* Confirm Password Field */}
@@ -149,6 +198,24 @@ export default function RegisterPage() {
               required
               className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
+          </div>
+
+          {/* Role Field */}
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-foreground mb-2">
+              Role
+            </label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+            <option value="Manager">Manager</option>
+            <option value="Admin">Admin</option>
+            </select>
           </div>
 
           {/* Terms Checkbox */}

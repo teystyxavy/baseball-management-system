@@ -40,8 +40,7 @@ func RegisterUser(c *gin.Context){
 	var output dto.RegisterResponseDTO
 	output.Email = newUser.Email
 	output.Name = newUser.Name
-	output.IsAdmin = newUser.IsAdmin
-	output.IsManager = newUser.IsManager
+	output.Role = newUser.Role
 
 	c.IndentedJSON(http.StatusCreated, output)
 }
