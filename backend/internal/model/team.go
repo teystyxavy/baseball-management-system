@@ -1,12 +1,11 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"time"
 )
 
 type Team struct {
-	gorm.Model
+	ID int `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name string `json:"name" gorm:"unique;not null"`
 	Wins int `json:"wins"`
 	Losses int `json:"losses"`

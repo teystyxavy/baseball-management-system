@@ -1,10 +1,7 @@
 package model	
 
-import (
-    "gorm.io/gorm"
-)
 type Player struct {
-    gorm.Model
+    ID            int `json:"id" gorm:"primaryKey;autoIncrement"`
     Name          string `json:"name" gorm:"not null"`
     JerseyNumber   int `json:"jersey_number"`
     Position       string `json:"position"`

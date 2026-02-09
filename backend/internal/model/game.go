@@ -1,15 +1,11 @@
 package model
 
-import (
-	"gorm.io/gorm"
-)
-
 type Game struct {
-	gorm.Model
-	Team1ID int `json:"team_1_id" gorm:"not null;index"`
-	Team1 Team `json:"team_1" gorm:"foreignKey:Team1ID;references:ID"`
-	Team2ID int `json:"team_2_id" gorm:"not null;index"`
-	Team2 Team`json:"team_2" gorm:"foreignKey:Team2ID;references:ID"`
+	ID int `json:"id" gorm:"primaryKey;autoIncrement"`
+	Date       string `json:"date" gorm:"not null"`
+	Location  string `json:"location" gorm:"not null"`
+	HomeTeamID Team `json:"home_team_id" gorm:"foreignKey:home_team_id;references:ID"`
+	AwayTeamID Team `json:"away_team_id" gorm:"foreignKey:away_team_id;references:ID"`
 	RunsScored1 int `json:"runs_scored_1"`
 	RunsScored2 int `json:"runs_scored_2"`
 }

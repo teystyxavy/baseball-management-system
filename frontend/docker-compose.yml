@@ -28,22 +28,22 @@ services:
       postgres:
         condition: service_healthy
 
-  # backend-test:
-  #   build:
-  #     context: ../backend
-  #     dockerfile: Dockerfile
-  #   container_name: backend-test
-  #   environment:
-  #     DB_HOST: postgres
-  #     DB_USER: postgres
-  #     DB_PASSWORD: 4femqvbw
-  #     DB_NAME: postgres
-  #     PORT: 5432
-  #     JWT_SECRET: 07bec3efb9a9bb4a492679fde4ba61614063db260b101e8c925f75f51e6bc38b
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   command: ["go", "test", "./..."]
+  backend-test:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: backend-test
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: 4femqvbw
+      DB_NAME: postgres
+      PORT: 5432
+      JWT_SECRET: 07bec3efb9a9bb4a492679fde4ba61614063db260b101e8c925f75f51e6bc38b
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["go", "test", "./..."]
   
   postgres:
     image: postgres:16-alpine

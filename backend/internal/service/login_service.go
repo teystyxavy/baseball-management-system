@@ -23,7 +23,7 @@ func checkPassword(hashedPassword, password string) bool {
 }
 
 func isPasswordValid(password string) bool { // password must be at least 8 chars, contain 1 lower and uppercase letter, and contain a special character
-	validLength := len(password) > 8
+	validLength := len(password) >= 8
 	containsLower := false
 	containsUpper := false
 	containsSymbol := false
@@ -34,7 +34,7 @@ func isPasswordValid(password string) bool { // password must be at least 8 char
 		if unicode.IsUpper(r) {
 			containsUpper = true
 		}
-		if unicode.IsSymbol(r) {
+		if unicode.IsPunct(r) || unicode.IsSymbol(r) {
 			containsSymbol = true
 		}
 	}
